@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paceline+ Prototype Example | Southstar Strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#13161D; --card:#1C2230; --card2:#232A39; --line:#2C3445;
+    --cyan:#3FB7EB; --teal1:#092D39; --teal2:#246784;
+    --text:#FFFFFF; --muted:#8A93A3; --green:#4CD08A;
+    --sage:#315B49; --navy:#15252B; --mint:#DAE6DA; --sage2:#77897B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Barlow",-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--navy);color:var(--text);min-height:100vh}
+  button{font-family:inherit;cursor:pointer;border:0}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid #22383F}
+  .top .brand{letter-spacing:.25em;font-size:12px;font-weight:600;color:var(--cyan)}
+  .top .note{font-size:12px;color:#9FB3A6;font-style:italic}
+  .stage{display:flex;gap:48px;justify-content:center;align-items:center;padding:28px 32px 36px;flex-wrap:wrap}
+
+  /* phone */
+  .phone{width:380px;height:780px;border-radius:52px;background:#05070A;padding:12px;box-shadow:0 30px 60px rgba(0,0,0,.45),inset 0 0 0 2px #2A2F38;position:relative;flex:none}
+  .screen{width:100%;height:100%;border-radius:42px;background:var(--bg);overflow:hidden;position:relative;display:flex;flex-direction:column}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:110px;height:30px;border-radius:20px;background:#000;z-index:20}
+  .status{height:48px;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-size:14px;font-weight:600}
+  .status.dark{color:#000}
+  .body{flex:1;overflow:hidden;padding:8px 20px 22px;display:flex;flex-direction:column;position:relative}
+  .logo{font-weight:700;font-style:italic;font-size:26px;letter-spacing:-.5px}
+  .logo .l{color:var(--cyan)}
+  .btn{width:100%;background:var(--cyan);color:#0B1720;font-weight:600;font-size:16px;padding:14px;border-radius:30px}
+  .btn.ghost{background:transparent;color:var(--muted);font-weight:500;padding:10px}
+  .card{background:var(--card);border-radius:16px;padding:16px}
+  .muted{color:var(--muted)}
+  .h1{font-size:26px;font-weight:700;line-height:1.1}
+  .h2{font-size:19px;font-weight:600}
+  .small{font-size:13px}
+  .xs{font-size:11.5px}
+  .spacer{flex:1}
+  .pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;background:#22303A;color:var(--cyan);letter-spacing:.04em}
+
+  /* light (search / app store) */
+  .light{background:#F4F5F7;color:#1A1C20}
+  .light .muted{color:#6B7280}
+
+  /* side panel */
+  .side{width:400px;max-width:100%}
+  .stagecap{font-size:12px;letter-spacing:.22em;font-weight:600;color:var(--cyan);margin-bottom:10px}
+  .side h2{font-size:30px;line-height:1.15;font-weight:700;margin-bottom:18px}
+  .changed{background:var(--sage);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+  .changed .lab{font-size:12px;letter-spacing:.18em;font-weight:700;color:var(--mint);margin-bottom:6px}
+  .changed p{font-size:17px;line-height:1.4}
+  .was{border:1px solid #2F474B;border-radius:14px;padding:14px 20px;font-size:14.5px;line-height:1.4;color:#B9CAB9}
+  .was b{color:var(--mint);font-size:11.5px;letter-spacing:.16em;display:block;margin-bottom:4px}
+  .nav{display:flex;align-items:center;gap:14px;margin-top:26px}
+  .nav button{background:transparent;color:var(--mint);border:1px solid #3B5A55;border-radius:22px;padding:8px 18px;font-size:14px}
+  .nav button:disabled{opacity:.3;cursor:default}
+  .dots{display:flex;gap:6px}
+  .dots span{width:8px;height:8px;border-radius:50%;background:#35504C;cursor:pointer}
+  .dots span.on{background:var(--cyan)}
+  .hint{font-size:12px;color:#7E958A;margin-top:12px}
+
+  /* misc components */
+  .ring{position:relative;width:96px;height:96px}
+  .ring span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700}
+  .tick{color:var(--cyan);font-weight:700}
+  .dash{color:#4B5566}
+  table.cmp{width:100%;border-collapse:collapse;font-size:13px}
+  table.cmp td,table.cmp th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:center}
+  table.cmp td:first-child,table.cmp th:first-child{text-align:left}
+  table.cmp th{font-size:11px;letter-spacing:.06em;color:var(--muted);font-weight:600}
+  .plan{border:1.5px solid var(--line);border-radius:14px;padding:11px 14px;margin-top:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+  .plan.sel{border-color:var(--cyan);background:#16303D}
+  .radio{width:18px;height:18px;border-radius:50%;border:2px solid #4B5566;flex:none}
+  .plan.sel .radio{border:5px solid var(--cyan)}
+  .opt{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px;font-size:14.5px;cursor:pointer}
+  .opt.sel{border-color:var(--cyan);background:#16303D}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:#1A2030;border-radius:26px 26px 0 0;padding:22px 20px 26px;box-shadow:0 -10px 40px rgba(0,0,0,.5);z-index:5}
+  .dim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:4}
+  .alert{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%);width:270px;background:rgba(240,240,244,.97);color:#111;border-radius:16px;text-align:center;overflow:hidden;z-index:6}
+  .alert .t{padding:18px 16px 4px;font-weight:600;font-size:16px;line-height:1.25}
+  .alert .d{padding:0 16px 16px;font-size:13px;line-height:1.3}
+  .alert .row{display:flex;border-top:1px solid #C9C9CE}
+  .alert .row button{flex:1;background:transparent;padding:12px;font-size:16px;color:#0A84FF}
+  .alert .row button+button{border-left:1px solid #C9C9CE;font-weight:600}
+  .tabbar{display:flex;justify-content:space-around;border-top:1px solid var(--line);padding:10px 0 4px;font-size:10.5px;color:var(--muted);letter-spacing:.06em}
+  .tabbar .on{color:var(--cyan)}
+  .timeline{display:flex;justify-content:space-between;position:relative;margin-top:14px}
+  .timeline:before{content:"";position:absolute;left:8px;right:8px;top:7px;height:2px;background:var(--line)}
+  .timeline div{position:relative;text-align:center;width:25%;font-size:11px;color:var(--muted)}
+  .timeline i{display:block;width:16px;height:16px;border-radius:50%;background:var(--card2);border:2px solid var(--line);margin:0 auto 6px}
+  .timeline .done i{background:var(--cyan);border-color:var(--cyan)}
+  .timeline .done{color:#fff}
+    .wm{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:9.5px;letter-spacing:.08em;color:rgba(255,255,255,.32);z-index:30;pointer-events:none}
+  .light .wm{color:rgba(0,0,0,.3)}
+  .body{padding-bottom:28px}
+  .hero{height:210px;border-radius:18px;background:radial-gradient(circle at 70% 30%,#3FB7EB55,transparent 55%),linear-gradient(135deg,#0E3A4A,#1B5A6E 55%,#2C7A6A);position:relative;overflow:hidden}
+  .hero:after{content:"";position:absolute;right:-30px;bottom:-40px;width:220px;height:220px;border-radius:50%;border:26px solid #ffffff12}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="brand">PACELINE+ &nbsp;·&nbsp; PROTOTYPE EXAMPLE &nbsp;·&nbsp; SOUTHSTAR STRATEGY</div>
+  <div class="note">Illustrative concept based on my recommendations. Not a Paceline product.</div>
+</div>
+
+<div class="stage">
+  <div class="phone"><div class="notch"></div><div class="screen" id="screen"></div></div>
+  <div class="side">
+    <div class="stagecap" id="cap"></div>
+    <h2 id="title"></h2>
+    <div class="changed"><div class="lab" id="lab1">WHAT CHANGED</div><p id="changed"></p></div>
+    <div class="was"><b id="lab2">WHAT I NOTICED</b><span id="was"></span></div>
+    <div class="nav">
+      <button id="prev">← Back</button>
+      <div class="dots" id="dots"></div>
+      <button id="next">Next →</button>
+    </div>
+    <div class="hint">Tap the main button on the phone, or use the arrow keys.</div>
+  </div>
+</div>
+
+<script>
+const logo = '<span class="logo">pace<span class="l">l</span>ine</span>';
+const ring = (n)=>`<div class="ring"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="40" fill="none" stroke="#2C3445" stroke-width="9"/><circle cx="48" cy="48" r="40" fill="none" stroke="#3FB7EB" stroke-width="9" stroke-linecap="round" stroke-dasharray="${2.513*n} 999" transform="rotate(-90 48 48)"/></svg><span>${n}</span></div>`;
+let plan = 'annual', reason = null;
+
+const steps = [
+{ cap:"DISCOVER · 1 OF 11", title:"Search results", light:true,
+  changed:"Paceline+ and the free trial show up before anyone visits the site.",
+  was:"Results describe the free app well. Paceline+ and the free trial don't appear yet.",
+  html:()=>`
+  <div style="background:#fff;border-radius:24px;padding:10px 16px;font-size:15px;box-shadow:0 1px 4px #0002;display:flex;gap:10px;align-items:center"><span style="color:#888">⌕</span> paceline</div>
+  <div style="margin-top:18px;background:#fff;border-radius:16px;padding:16px">
+    <div class="xs muted">paceline.fit</div>
+    <div class="chg" style="margin:4px 0 6px"><div style="color:#1A0DAB;font-size:18px;line-height:1.25;margin-bottom:6px;font-weight:500">Paceline: Fitness Rewards + Paceline+ | Try it free for 14 days</div>
+    <div class="small" style="color:#444;line-height:1.4">Get rewarded for every workout with the free app. Upgrade to Paceline+ for personalized goals and health insights. Try it free for 14 days.</div></div>
+    <div class="chg" style="margin-top:14px;padding-top:4px">
+      <div style="color:#1A0DAB;font-size:15px">Paceline+</div>
+      <div class="xs muted">Personalized health insights</div>
+    </div>
+    <div style="margin-top:10px;border-top:1px solid #eee;padding-top:10px">
+      <div style="color:#1A0DAB;font-size:15px">How rewards work</div>
+      <div class="xs muted">Earn Pacepoints for your workouts</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>Open paceline.fit</button>`},
+
+{ cap:"DISCOVER · 2 OF 11", title:"Homepage",
+  changed:"The free trial is the main CTA, and the health score gets a line of context.",
+  was:"A clear, warm message and enticing imagery. The free trial and Paceline+ aren't mentioned, though the health score is.",
+  html:()=>`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">${logo}<span class="muted">☰</span></div>
+  <div class="hero"><div style="position:absolute;left:18px;bottom:18px;font-size:30px;font-weight:700;line-height:1;letter-spacing:.02em">HEALTHY<br>FEELS GOOD.</div></div>
+  <p class="chg" style="margin-top:14px;font-size:15.5px;line-height:1.4">Earn rewards for every workout. Try Paceline+ free for 14 days for additional rewards and more.</p>
+  <div class="card chg" style="display:flex;gap:14px;align-items:center;margin-top:18px">${ring(78)}<div><div class="h2" style="font-size:16px">Your health score</div><div class="small muted" style="line-height:1.35;margin-top:3px">One number for how your activity, sleep and recovery are trending.</div></div></div>
+  <div class="spacer"></div>
+  <button class="btn chg" style="border-radius:30px" data-next>Start free</button>`},
+
+{ cap:"DISCOVER · 3 OF 11", title:"App Store", light:true,
+  changed:"One consistent promise, and Paceline+ is visible before install. Paceline's own ad holds the top spot for its name.",
+  was:"The listing leads with \"Fitness Rewards,\" while the site leads with \"Healthy feels good.\" Competitor ads sit above Paceline on its own name.",
+  html:()=>`
+  <div style="background:#E4E5EA;border-radius:12px;padding:8px 12px;font-size:14px;color:#555">⌕ paceline</div>
+  <div style="background:#fff;border-radius:16px;padding:14px;margin-top:12px">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:58px;height:58px;border-radius:14px;background:#13161D;display:flex;align-items:center;justify-content:center;color:#3FB7EB;font-weight:700;font-style:italic;font-size:26px">p</div>
+      <div class="chg" style="flex:1;outline-offset:3px"><div style="font-weight:600;font-size:16px">Paceline</div><div class="xs muted">Healthy feels good. Get rewarded for it.</div><span style="font-size:10px;background:#E8F1FB;color:#0A66C2;padding:1px 6px;border-radius:4px;font-weight:600">Ad</span></div>
+      <span style="background:#E8EAF0;color:#0A84FF;font-weight:700;border-radius:16px;padding:5px 16px;font-size:14px">GET</span>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <div class="chg" style="flex:1;height:178px;outline-offset:3px;background:linear-gradient(160deg,#0E3A4A,#246784);color:#fff;padding:12px;display:flex;flex-direction:column;justify-content:space-between">
+        <div style="font-weight:700;font-size:15px;line-height:1.15">Paceline+<br><span style="color:#3FB7EB">Free trial</span></div>
+        <div style="font-size:10.5px;opacity:.85">Personalized goals & health insights</div></div>
+      <div style="flex:1;height:178px;border-radius:12px;background:#13161D;color:#fff;padding:12px;font-weight:700;font-size:15px;line-height:1.15">Get rewarded<br>for every<br>workout</div>
+      <div style="flex:.5;height:178px;border-radius:12px 0 0 12px;background:#1C2230"></div>
+    </div>
+  </div>
+  <div class="chg" style="background:#fff;border-radius:16px;padding:14px;margin-top:14px">
+    <div style="font-weight:600;font-size:15px">What's New</div>
+    <div class="small" style="color:#444;margin-top:4px;line-height:1.4">Introducing Paceline+ — personalized goals and health insights. Try it free for 14 days.</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>Get the app</button>`},
+
+{ cap:"SIGN UP + TRUST · 4 OF 11", title:"Sign in",
+  changed:"The sign-in prompt names Paceline's own domain, so it doesn't look like a third party.",
+  was:"iOS asked to use \"prod-paceline-app-users.auth.us-east-1.amazoncognito.com,\" which reads like a third party.",
+  html:()=>`
+  <div style="text-align:center;margin-top:40px">${logo}</div>
+  <div class="spacer"></div>
+  <button class="btn" style="background:#fff;color:#111"> Sign in with Apple</button>
+  <button class="btn" style="background:transparent;border:1px solid var(--line);color:#fff;margin-top:10px">Sign in with Google</button>
+  <div class="dim"></div>
+  <div class="alert chg" style="border-radius:16px"><div class="t">“Paceline” Wants to Use “paceline.fit” to Sign In</div><div class="d">This allows the app and website to share information about you.</div><div class="row"><button>Cancel</button><button data-next>Continue</button></div></div>`},
+
+{ cap:"SIGN UP + TRUST · 5 OF 11", title:"Before Health access",
+  changed:"New members see what they'll get and how their data is handled before the Health request.",
+  was:"Health access was an early request, before new members had seen the payoff.",
+  html:()=>`
+  <div class="h1" style="margin-top:18px">Here's what you'll get</div>
+  <div class="chg" style="margin-top:18px;display:grid;gap:10px;border-radius:18px">
+    <div class="card" style="display:flex;gap:12px;align-items:center"><span style="font-size:22px">🏅</span><div><b>Earn Pacepoints automatically</b><div class="small muted">Every workout counts, no logging.</div></div></div>
+    <div class="card" style="display:flex;gap:12px;align-items:center"><span style="font-size:22px">📈</span><div><b>See your weekly progress</b><div class="small muted">Streaks, badges and trends in one place.</div></div></div>
+    <div class="card" style="display:flex;gap:12px;align-items:center"><span style="font-size:22px">🎯</span><div><b>Personalized goals</b><div class="small muted">Built around how you actually move.</div></div></div>
+  </div>
+  <div class="chg" style="margin-top:20px;border-radius:16px;padding:14px 16px;background:linear-gradient(135deg,var(--teal1),var(--teal2))">
+    <div style="font-weight:600">🔒 Your data stays private</div>
+    <div class="small" style="opacity:.85;margin-top:3px">You choose what to share.</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>Connect Health</button>`},
+
+{ cap:"SIGN UP + TRUST · 6 OF 11", title:"Health access",
+  changed:"The standard iOS request now comes after the member understands why.",
+  was:"The request came up before trust had been built.",
+  html:()=>`
+  <div style="text-align:center;margin-top:16px"><div style="width:56px;height:56px;border-radius:14px;background:#fff;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:30px;color:#FF375F">♥</div>
+  <div class="h2" style="margin-top:12px">Health</div><div class="small muted" style="margin-top:4px">“Paceline” would like to access and update your Health data.</div></div>
+  <div class="card" style="margin-top:18px;padding:4px 14px">
+    ${["Active Energy","Workouts","Steps","Resting Heart Rate"].map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)"><span class="small">${x}</span><span style="width:42px;height:24px;border-radius:12px;background:#34C759;position:relative"><i style="position:absolute;right:2px;top:2px;width:20px;height:20px;border-radius:50%;background:#fff"></i></span></div>`).join('')}
+  </div>
+  <div class="spacer"></div>
+  <button class="btn chg" style="background:#3A3F4B;color:#fff;border-radius:30px" data-next>Allow</button>
+  <button class="btn ghost">Don't Allow</button>`},
+
+{ cap:"FIRST VALUE · 7 OF 11", title:"Home, with your own data",
+  changed:"The free loop lands first, using the member's own workout instead of sample data. No upsell yet.",
+  was:"\"Let's Go\" opened a detailed screen built on sample data, with the Paceline+ pitch on an empty week.",
+  html:()=>`
+  <div style="display:flex;justify-content:space-between;align-items:center"><span class="pill">RU</span><b style="color:var(--cyan)">50 pts</b><span class="muted">🔔</span></div>
+  <div class="h1" style="margin-top:16px">Good morning</div>
+  <div class="small muted">Your first workout synced.</div>
+  <div class="card chg" style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-weight:600">Morning walk</div><div class="small muted">32 min · 2.1 mi</div></div>
+    <div style="color:var(--cyan);font-weight:700">+50</div>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <div style="display:flex;justify-content:space-between"><b>Your streak</b><span class="pill chg" style="color:var(--green);border-radius:20px;outline-offset:3px">FREE</span></div>
+    <div style="font-size:34px;font-weight:700;margin-top:4px">Day 1 🔥</div>
+    <div class="small muted">Work out tomorrow to keep it going.</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>See my Pacepoints</button>
+  <div class="tabbar" style="margin:12px -20px -10px"><span class="on">HEALTH</span><span>REWARDS</span><span>SOCIAL</span></div>`},
+
+{ cap:"UPGRADE · 8 OF 11", title:"The offer, at the first win",
+  changed:"The trial is offered at the first earned moment, with one clear benefit tied to the member's own workout.",
+  was:"\"Unlock your weekly focus with Paceline+\" came before the member had anything of their own.",
+  html:()=>`
+  <div class="h1" style="margin-top:16px;opacity:.35">Good morning</div>
+  <div class="card" style="margin-top:14px;opacity:.35"><b>Morning walk</b></div>
+  <div class="dim"></div>
+  <div class="sheet chg-in">
+    <div style="font-size:36px">🎉</div>
+    <div class="h2" style="font-size:22px;margin-top:6px">Nice work. You just earned your first 50 Pacepoints.</div>
+    <p class="muted" style="margin-top:8px;line-height:1.4">Want to see what that workout did for your health? Try Paceline+ free for 14 days.</p>
+    <button class="btn" style="margin-top:18px" data-next>Start your free trial</button>
+    <button class="btn ghost">Maybe later</button>
+  </div>`},
+
+{ cap:"PLAN + OFFER + CHECKOUT · 9 OF 11", title:"Membership + plan",
+  changed:"One path, trial first, benefits where people decide, price secondary. Keeps annual preselected and the 55% savings.",
+  was:"\"Choose your plan\" was the strongest element; \"Start a free trial\" was smaller. Pricing came first and two checkout routes coexisted.",
+  html:()=>`
+  <div class="chg" style="margin-top:4px"><div class="h1" style="font-size:24px">Start your 14-day free trial</div>
+  <div style="color:var(--green);font-weight:600;margin-top:2px">$0 today</div></div>
+  <table class="cmp chg" style="margin-top:14px">
+    <tr><th></th><th>FREE</th><th style="color:var(--cyan)">PACELINE+</th></tr>
+    <tr><td>Rewards for workouts</td><td class="tick">✓</td><td class="tick">✓</td></tr>
+    <tr><td>Streaks & badges</td><td class="tick">✓</td><td class="tick">✓</td></tr>
+    <tr><td>Personalized weekly goals</td><td class="dash">–</td><td class="tick">✓</td></tr>
+    <tr><td>Health insights & score detail</td><td class="dash">–</td><td class="tick">✓</td></tr>
+  </table>
+  <div class="plan ${plan==='annual'?'sel':''}" data-plan="annual"><div><b>Annual</b> <span style="color:var(--green);font-size:13px">Save 55%</span><div class="xs muted">$5.83/mo · $69.99/yr after trial</div></div><div class="radio"></div></div>
+  <div class="plan ${plan==='monthly'?'sel':''}" data-plan="monthly"><div><b>Monthly</b><div class="xs muted">$12.99/mo after trial</div></div><div class="radio"></div></div>
+  <div class="xs muted chg" style="margin-top:14px;line-height:1.4">🔔 We'll remind you before your trial ends. Cancel anytime in Settings.</div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>Start your free trial</button>
+  <div class="xs muted chg" style="text-align:center;margin-top:10px">Billed through the App Store</div>`},
+
+{ cap:"IN TRIAL · 10 OF 11", title:"Day 5: the first \"aha\"",
+  changed:"Premium value is felt well before day 14, using the member's own data.",
+  was:"The feature tour describes personalized goals and insights. The open question: what's the earliest personal \"aha\" that justifies paying?",
+  html:()=>`
+  <div style="display:flex;justify-content:space-between;align-items:center">${logo}<span class="pill">PACELINE+ TRIAL</span></div>
+  <div class="chg" style="margin-top:18px;border-radius:18px;padding:18px;background:linear-gradient(135deg,var(--teal1),var(--teal2))">
+    <div class="xs" style="letter-spacing:.14em;color:var(--cyan);font-weight:700">YOUR FIRST INSIGHT IS READY</div>
+    <div style="font-size:21px;font-weight:600;line-height:1.3;margin-top:8px">Your resting heart rate dropped 3 bpm this week.</div>
+    <div class="small" style="opacity:.85;margin-top:6px">Your 3 walks are paying off.</div>
+    <svg viewBox="0 0 300 70" style="width:100%;margin-top:12px"><polyline fill="none" stroke="#3FB7EB" stroke-width="3" stroke-linecap="round" points="5,18 55,22 105,30 155,34 205,44 255,50 295,54"/><circle cx="295" cy="54" r="5" fill="#fff"/></svg>
+  </div>
+  <div class="card chg" style="margin-top:18px">
+    <b class="small">Your trial</b>
+    <div class="timeline">
+      <div class="done"><i></i>Day 0<br>Start</div>
+      <div class="done"><i></i>Day 5<br>First insight</div>
+      <div><i></i>Day 12<br>Reminder</div>
+      <div><i></i>Day 14<br>Decide</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-next>See my weekly goals</button>`},
+
+{ cap:"MEASURE · 11 OF 11", title:"If someone cancels",
+  changed:"A one-question survey shows why people leave, so the team can fix the right thing.",
+  was:"No signal on why members cancel. Pair this with tracking source → account → trial → paid by plan and cohort.",
+  html:()=>`
+  <div class="h1" style="font-size:24px;margin-top:10px">Before you go</div>
+  <div class="chg" style="margin-top:10px;border-radius:14px"><p class="muted">What's the main reason you're canceling?</p>
+  ${["It costs too much","I didn't see enough value yet","I only wanted the free rewards","I'm using another app","Something else"].map(r=>`<div class="opt ${reason===r?'sel':''}" data-reason="${r}">${r}</div>`).join('')}</div>
+  <div class="spacer"></div>
+  <button class="btn" style="${reason?'':'opacity:.45'}" data-next>${reason?'Thanks for telling us':'Submit'}</button>
+  <button class="btn ghost">Keep Paceline+</button>`},
+
+{ cap:"END", title:"End of prototype", lab1:"THE APPROACH", lab2:"PREPARED BY",
+  changed:"Reduce friction so more people get started. Create early, meaningful value so they convert and stay.",
+  was:"Rachel Rosenkrantz  |  Southstar Strategy",
+  html:()=>`
+  <div class="spacer"></div>
+  <div style="text-align:center">${logo}
+    <div style="width:64px;height:64px;border-radius:50%;margin:26px auto 0;background:linear-gradient(135deg,var(--teal1),var(--teal2));display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--cyan)">✓</div>
+    <div class="h1" style="margin-top:20px">End of prototype</div>
+    <p class="muted" style="margin-top:10px;line-height:1.45">Thanks for walking through it.<br>Every screen is an illustration of a recommendation, not a live Paceline experience.</p>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" data-restart>Start over</button>`}
+];
+
+let i = 0;
+const $ = s=>document.querySelector(s);
+function render(){
+  const s = steps[i];
+  const scr = $('#screen');
+  scr.className = 'screen' + (s.light ? ' light' : '');
+  scr.innerHTML = `<div class="status ${s.light?'dark':''}"><span>9:41</span><span>●●● ▮</span></div><div class="body">${s.html()}</div><div class="wm">FOR ILLUSTRATIVE PURPOSES ONLY</div>`;
+  $('#lab1').textContent = s.lab1||'WHAT CHANGED'; $('#lab2').textContent = s.lab2||'WHAT I NOTICED';
+  $('#cap').textContent = s.cap; $('#title').textContent = s.title;
+  $('#changed').textContent = s.changed; $('#was').textContent = s.was;
+  $('#prev').disabled = i===0; $('#next').disabled = i===steps.length-1;
+  $('#dots').innerHTML = steps.map((_,k)=>`<span class="${k===i?'on':''}" data-k="${k}"></span>`).join('');
+  scr.querySelectorAll('[data-next]').forEach(b=>b.onclick=()=>go(1));
+  scr.querySelectorAll('[data-restart]').forEach(b=>b.onclick=()=>{i=0;plan='annual';reason=null;render();});
+  scr.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{plan=b.dataset.plan;render();});
+  scr.querySelectorAll('[data-reason]').forEach(b=>b.onclick=()=>{reason=b.dataset.reason;render();});
+  document.querySelectorAll('#dots span').forEach(d=>d.onclick=()=>{i=+d.dataset.k;render();});
+}
+function go(d){ i=Math.max(0,Math.min(steps.length-1,i+d)); render(); }
+$('#prev').onclick=()=>go(-1); $('#next').onclick=()=>go(1);
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight')go(1); if(e.key==='ArrowLeft')go(-1); });
+const q = new URLSearchParams(location.search).get('s'); if(q) i = Math.max(0,Math.min(steps.length-1,(+q)-1));
+render();
+</script>
+</body>
+</html>
